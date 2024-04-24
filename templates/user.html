@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>FaaS</title>
+</head>
+<body>
+<!-- Similarly h2,h3,h4,h5,h6 with decrease in sizes -->
+<h1 style="text-align:center;">Function as a Service</h1>
+<form action="http://localhost:31000/register" method="post" enctype="multipart/form-data">
+<input type="radio"name="reg_type" value="1"><b>Register function by files</b><br>
+Choose the file to be sent (.tgz or .tar.gz)
+<input type="file"name="file"><br>
+Command for starting your container/function/image
+<input type="text" name ="Command" value="/bin/bash"><br>
+<br><br><br><br><br>
+
+
+<input type="radio"name="reg_type" value="2"><b>Register function by image name</b><br>
+Name of the docker hub image name
+<input type="text" name="imagename"><br>
+Command for starting your container/function/image
+<input type="text" name ="Command" value="/bin/bash"><br>
+
+<br><br><br><br><br>
+
+
+<!-- text inputs -->
+<!-- submit button which sends the form -->
+<input type="radio" name="reg_type" value="3"><b>Register trigger</b><br>
+URL at which trigger should happen
+<input type="text" name ="url"><br>
+Image name for which trigger should happen
+<input type="text" name ="image"><br>
+<input type="radio" name="trigger" value="GET">Get method<br>
+<input type="radio" name="trigger" value="POST">Post method<br>
+
+
+<!-- single correct buttons -->
+<input type="submit" value="Submit">
+<!-- *value* will be displayed in the text box, *name* will be used by server, *id* will be used by other html objects to reference -->
+</form>
+</body>
+</html>
