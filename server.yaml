@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: serverdeployment
+  labels:
+    app: server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: server
+  template:
+    metadata:
+      labels:
+        app: server
+    spec:
+      volumes:
+        - name: pvc-storage
+          persistentVolumeClaim:
+            claimName: database-pvc
+      containers:
+        - name: task-pv-container
+          image: pvrsaikumar/cs695:server
+          command: ["/bin/sh", "-c"]
+          args:
+            - while true; do
+                sleep 1;
+              done
+          volumeMounts:
+            - mountPath: /Data
+              name: pvc-storage
+          ports:
+            - containerPort: 32000
+            - containerPort: 31000

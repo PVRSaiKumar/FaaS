@@ -1,0 +1,23 @@
+FROM ubuntu
+    RUN apt-get update && apt-get install -y gcc libreadline6-dev zlib1g-dev bison flex less vim git make
+    RUN apt-get install -y python3.11 python3-pip
+    RUN pip install pipreqs
+    RUN apt-get install -y curl
+    RUN apt-get install -y libicu-dev pkg-config
+    RUN curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+    RUN chmod +x ./kubectl
+    RUN mv ./kubectl /usr/local/bin
+    RUN adduser client
+    USER client
+    WORKDIR /home/client
+    COPY server.py .
+    COPY config.yaml .
+    COPY user_depl.yaml .
+    RUN mkdir templates
+    COPY templates/user.html templates/user.html
+    ENV PATH=$PATH:~/.local/bin
+    ENV PS1='\[\e]0;\u@\h: \w\a\]${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
+    RUN pipreqs --encoding=iso-8859-1 .
+    RUN pip3 install -r requirements.txt
+    RUN echo 'alias kubectl="kubectl --kubeconfig config.yaml"' >> ~/.bashrc
+    
