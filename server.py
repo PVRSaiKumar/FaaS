@@ -42,7 +42,9 @@ def reg():
 			os.system("docker login -u pvrsaikumar -p 123456789")
 			imageno = random.randint(0,10000)
 			image = "pvrsaikumar/cs695:image"+str(imageno)
-			command = request.form['Command']### HAVE TO SEE WHEN TO USE IT
+			command = request.form['Command1']
+			arguments = request.form['Arguments1']
+			print("$"+arguments+"$")
 			
 			while (os.system("docker pull "+image+" 2>/dev/null") ==0):
 				os.system("docker rmi "+image)
@@ -55,23 +57,49 @@ def reg():
 			os.system("docker rmi "+image)
 
 			function_data = json.load(open(functions,'r'))
-			function_data[image]=command
+			function_data[image]=[command,arguments]
 			trigger_data = json.load(open(triggers,'r'))
 			trigger_data[image]=[]
 			json.dump(function_data,open(functions,'w'))
 			json.dump(trigger_data,open(triggers,'w'))
 
 			### DEPLOYING THE DEPLOYMENT FOR THAT IMAGE
-			os.system("cp user_depl.yaml user_depl2.yaml")
-			os.system("sed -i 's/<IMAGE>/image"+imageno+"/' user_depl2.yaml")
-			os.system("kubectl apply -f user_depl2.yaml")
+			yaml_data = f'''apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: image{imageno}-deployment
+  labels:
+    app: cont
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cont
+  template:
+    metadata:
+      labels:
+        app: cont
+    spec:
+      containers:
+      - name: image{imageno}-cont
+        image: {image}
+        command: {command}
+        args: {arguments}
+'''
+			file = open("user_depl.yaml","w")
+			file.write(yaml_data)
+			file.close()
+			os.system("kubectl --kubeconfig $PWD/config.yaml apply -f user_depl.yaml")
 
 			return "received "+tarfile.filename+" stored as pvrsaikumar/"+image
 		else:
 			return "incorrect file type"
 	elif request.form['reg_type']=="2":
 		image = request.form['imagename']
-		command = request.form['Command']### HAVE TO SEE WHEN TO USE IT
+		command = request.form['Command2']
+		arguments = request.form['Arguments2']
+		print("$"+arguments+"$")
+
 		if(os.system("docker pull "+image+" 2>/dev/null")>0):
 			print("can't pull the image "+image+" :(")
 			return "can't pull the given image "+image
@@ -93,9 +121,9 @@ def reg():
 			os.system("docker rmi "+myimage)
 		else:
 			print("$1")
-			imageno = image[18:]
+			imageno = image[23:]
 		function_data = json.load(open(functions,'r'))
-		function_data[image]=command
+		function_data[image]=[command,arguments]
 		trigger_data = json.load(open(triggers,'r'))
 		trigger_data[image]=[]
 		json.dump(function_data,open(functions,'w'))
@@ -103,13 +131,34 @@ def reg():
 
 
 		### DEPLOYING THE DEPLOYMENT FOR THAT IMAGE
-		print("came here")
-		os.system("cp user_depl.yaml user_depl2.yaml")
-		os.system("sed -i 's/<IMAGE>/"+imageno+"/' user_depl2.yaml")
-		os.system("kubectl apply -f user_depl2.yaml")
-		# os.system("rm user_depl2.yaml")
+		yaml_data = f'''apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: image{imageno}-deployment
+  labels:
+    app: cont
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cont
+  template:
+    metadata:
+      labels:
+        app: cont
+    spec:
+      containers:
+      - name: image{imageno}-cont
+        image: pvrsaikumar/cs695:image{imageno}
+        command: {command}
+        args: {arguments}
+'''
+		file = open("user_depl.yaml","w")
+		file.write(yaml_data)
+		file.close()
+		os.system("kubectl --kubeconfig $PWD/config.yaml apply -f user_depl.yaml")
 		
-		return "image "+image+" received successfully"
+		return "image "+image+" deployed successfully"
 	
 	elif request.form['reg_type']=="3":
 		url = request.form['url']
