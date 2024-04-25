@@ -11,7 +11,9 @@
 Choose the file to be sent (.tgz or .tar.gz)
 <input type="file"name="file"><br>
 Command for starting your container/function/image
-<input type="text" name ="Command" value="/bin/bash"><br>
+<input type="text" name ="Command1" value="['/bin/bash']"><br>
+Arguments for starting your container/function/image
+<input type="text" name ="Arguments1" value=""><br>['-c', 'while true; do echo "hello"; sleep 1; done']
 <br><br><br><br><br>
 
 
@@ -19,8 +21,10 @@ Command for starting your container/function/image
 Name of the docker hub image name
 <input type="text" name="imagename"><br>
 Command for starting your container/function/image
-<input type="text" name ="Command" value="/bin/bash"><br>
-
+<input type="text" name ="Command2" value="['/bin/bash']"><br>
+Arguments for starting your container/function/image
+<input type="text" name ="Arguments2" value=""><br>
+['-c', 'while true; do echo "hello"; sleep 1; done']
 <br><br><br><br><br>
 
 
