@@ -1,0 +1,17 @@
+kind: Service
+apiVersion: v1
+metadata:
+ name: nodeservice
+spec:
+ type: LoadBalancer
+ selector:
+   app: server
+ ports:
+ - name: nodeserver1
+   port: 10000
+   targetPort: 31000
+   nodePort: 32000
+ - name: nodeserver2
+   port: 10001
+   targetPort: 31001
+   nodePort: 32001

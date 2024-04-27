@@ -37,6 +37,13 @@ Image name for which trigger should happen
 <input type="text" name ="image"><br>
 <input type="radio" name="trigger" value="GET">Get method<br>
 <input type="radio" name="trigger" value="POST">Post method<br>
+Command to run in your container/function/image after trigger
+<input type="text" name ="Command3" value=""><br>
+/bin/bash -c python3 app.py<br>
+Later, this will be changed to /bin/bash -c python3 app.py no.of.arguments arguments no.of.files filenames<br>
+Files u want in return as a http response (Comma separated strings) <input type="text" name ="return" value=""><br>
+result.txt, result.img
+<br><br><br>
 
 
 <!-- single correct buttons -->

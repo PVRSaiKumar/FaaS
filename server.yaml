@@ -18,17 +18,17 @@ spec:
         - name: pvc-storage
           persistentVolumeClaim:
             claimName: database-pvc
+      
       containers:
         - name: task-pv-container
-          image: pvrsaikumar/cs695:server
+          image: pvrsaikumar/cs695:dindserver
+          imagePullPolicy: Always
           command: ["/bin/sh", "-c"]
           args:
-            - while true; do
-                sleep 1;
-              done
+            - dockerd & python3 server.py & python3 handler.py
           volumeMounts:
-            - mountPath: /Data
+            - mountPath: /work/Data
               name: pvc-storage
           ports:
-            - containerPort: 32000
+            - containerPort: 31001
             - containerPort: 31000

@@ -7,11 +7,15 @@ RUN curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s
 RUN chmod +x ./kubectl
 RUN mv ./kubectl /usr/local/bin
 RUN mkdir work
-WORKDIR /work/
+WORKDIR /work
 COPY server.py .
+COPY handler.py .
 COPY config.yaml .
+COPY cont_manager.py .
 RUN mkdir templates
 COPY templates/user.html templates/user.html
 ENV PATH=$PATH:~/.local/bin
 RUN pipreqs --encoding=iso-8859-1 .
 RUN pip3 install -r requirements.txt
+EXPOSE 31000
+EXPOSE 31001

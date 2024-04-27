@@ -1,0 +1,14 @@
+kind: Service
+apiVersion: v1
+metadata:
+ name: dindservice
+spec:
+ selector:
+   app: server
+ ports:
+ - name: server
+   port: 10000
+   targetPort: 31000
+ - name: handler
+   port: 10001
+   targetPort: 31001
