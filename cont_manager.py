@@ -27,7 +27,7 @@ def catch_all(path):
 	for i in received_files:
 		exec_command+=" "+i
 	
-	os.system(exec_command)
+	os.system(exec_command)#+" > output")
 	
 	zip_filename = 'multiple_files.zip'
 
