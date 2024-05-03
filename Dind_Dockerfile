@@ -11,6 +11,9 @@ WORKDIR /work
 COPY server.py .
 COPY handler.py .
 COPY config.yaml .
+COPY ca.crt .
+COPY client.crt .
+COPY client.key .
 COPY cont_manager.py .
 RUN mkdir templates
 COPY templates/user.html templates/user.html

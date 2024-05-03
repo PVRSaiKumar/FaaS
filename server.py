@@ -25,7 +25,7 @@ def reg():
 		tarfile = request.files["file"]
 		print("received",tarfile.filename)
 		if(tarfile.filename[-4:]==".tgz" or tarfile.filename[-7:]==".tar.gz"):
-			tarfile.save("images/"+tarfile.filename)
+			tarfile.save(f"images/{tarfile.filename}")
 			os.system("rm Dockerfile")
 			os.system(f'''echo "FROM ubuntu
 			RUN apt-get update && apt-get install -y gcc libreadline6-dev zlib1g-dev bison flex less vim git make
@@ -42,29 +42,29 @@ def reg():
 			WORKDIR /home/client
 			COPY cont_manager.py .
 			" > Dockerfile''')
-			os.system("tar -xvzf images/"+tarfile.filename+" -C images/")
-			os.system("rm images/"+tarfile.filename)
-			os.system("echo \"COPY "+"images/"+" .\" >> Dockerfile")
+			os.system(f"tar -xvzf images/{tarfile.filename} -C images/")
+			os.system(f"rm images/{tarfile.filename}")
+			os.system("echo \"COPY images/ .\" >> Dockerfile")
 			os.system('''echo "ENV PATH=\$PATH:~/.local/bin
 			RUN pipreqs --encoding=iso-8859-1 .
 			RUN pip3 install -r requirements.txt" >> Dockerfile''')
 
 			os.system("docker login -u pvrsaikumar -p 123456789")
 			imageno = random.randint(0,10000)
-			image = "pvrsaikumar/cs695:image"+str(imageno)
+			image = f"pvrsaikumar/cs695:image{imageno}"
 			command = request.form['Command1']
 			arguments = request.form['Arguments1']
-			print("$"+arguments+"$")
+			print(f"${arguments}$")
 			
-			while (os.system("docker pull "+image+" 2>/dev/null") ==0):
-				os.system("docker rmi "+image)
+			while (os.system(f"docker pull {image} 2>/dev/null") ==0):
+				os.system(f"docker rmi {image}")
 				imageno = random.randint(0,10000)
-				image = "pvrsaikumar/cs695:image"+str(imageno)
-			os.system("docker build -t "+image+" .")
+				image = f"pvrsaikumar/cs695:image{imageno}"
+			os.system(f"docker build -t {image} .")
 			os.system("rm -rf images")
 			os.system("mkdir images")
-			os.system("docker push "+image)
-			os.system("docker rmi "+image)
+			os.system(f"docker push {image}")
+			os.system(f"docker rmi {image}")
 
 			function_data = json.load(open(functions,'r'))
 			function_data[image]=[command,arguments]
@@ -93,7 +93,7 @@ spec:
         image: {image}
         command: {command}
         args: {arguments}
-		ports:
+        ports:
         - containerPort: {CONT_PORT}
 '''
 			file = open("user_depl.yaml","w")
@@ -109,17 +109,17 @@ spec:
  selector:
    app: image{imageno}-app
  ports:
- - name: cont_manager
+ - name: cont-manager
    port: {SERVICE_PORT}
    targetPort: {CONT_PORT}" > service.yaml""")
 			os.system("kubectl --kubeconfig $PWD/config.yaml apply -f service.yaml")
 
-			IP = subprocess.check_output("kubectl --kubeconfig $PWD/config.yaml get services image"+imageno+"-service | awk 'FNR == 2 {print $3; exit}'",shell=True,text=True)
+			IP = subprocess.check_output("kubectl --kubeconfig $PWD/config.yaml get services image"+str(imageno)+"-service | awk 'FNR == 2 {print $3; exit}'",shell=True,text=True)
 			function_data[image].append(IP.replace("\n",""))
 			json.dump(function_data,open(functions,'w'))
 			json.dump(trigger_data,open(triggers,'w'))
 
-			return "received "+tarfile.filename+" stored as pvrsaikumar/"+image
+			return f"received {tarfile.filename} stored as pvrsaikumar/{image}"
 		else:
 			return "incorrect file type"
 	elif request.form['reg_type']=="2":
@@ -127,21 +127,21 @@ spec:
 		command = request.form['Command2']
 		arguments = request.form['Arguments2']
 
-		if(os.system("docker pull "+image+" 2>/dev/null")>0):
-			print("can't pull the image "+image+" :(")
-			return "can't pull the given image "+image
+		if(os.system(f"docker pull {image} 2>/dev/null")>0):
+			print(f"can't pull the image {image} :(")
+			return f"can't pull the given image {image}"
 
 		imageno = None
 		myimage = None
 		if(image[:18]!="pvrsaikumar/cs695:"):
 			os.system("docker login -u pvrsaikumar -p 123456789")
 			imageno = random.randint(0,10000)
-			myimage = "pvrsaikumar/cs695:image"+str(imageno)
+			myimage = f"pvrsaikumar/cs695:image{imageno}"
 			
-			while (os.system("docker pull "+myimage+" 2>/dev/null") ==0):
-				os.system("docker rmi "+myimage)
+			while (os.system(f"docker pull {myimage} 2>/dev/null") ==0):
+				os.system(f"docker rmi {myimage}")
 				imageno = random.randint(0,10000)
-				myimage = "pvrsaikumar/cs695:image"+str(imageno)
+				myimage = f"pvrsaikumar/cs695:image{imageno}"
 
 			os.system(f'''echo "FROM {image}
 			EXPOSE {CONT_PORT}
@@ -151,11 +151,11 @@ spec:
 			RUN pipreqs --encoding=iso-8859-1 .
 			RUN pip3 install -r requirements.txt" >> Dockerfile''')
 
-			os.system("docker build -t "+myimage+" .")
+			os.system(f"docker build -t {myimage} .")
 			os.system("docker login -u pvrsaikumar -p 123456789")
-			os.system("docker push "+myimage)
-			os.system("docker rmi "+image)
-			os.system("docker rmi "+myimage)
+			os.system(f"docker push {myimage}")
+			os.system(f"docker rmi {image}")
+			os.system(f"docker rmi {myimage}")
 		else:
 			imageno = image[23:]
 		function_data = json.load(open(functions,'r'))
@@ -185,7 +185,7 @@ spec:
         image: {myimage}
         command: {command}
         args: {arguments}
-		ports:
+        ports:
         - containerPort: {CONT_PORT}
 '''
 		file = open("user_depl.yaml","w")
@@ -201,22 +201,22 @@ spec:
  selector:
    app: image{imageno}-app
  ports:
- - name: cont_manager
+ - name: cont-manager
    port: {SERVICE_PORT}
    targetPort: {CONT_PORT}" > service.yaml""")
 		os.system("kubectl --kubeconfig $PWD/config.yaml apply -f service.yaml")
 
-		IP = subprocess.check_output("kubectl --kubeconfig $PWD/config.yaml get services image"+imageno+"-service | awk 'FNR == 2 {print $3; exit}'",shell=True,text=True)
+		IP = subprocess.check_output("kubectl --kubeconfig $PWD/config.yaml get services image"+str(imageno)+"-service | awk 'FNR == 2 {print $3; exit}'",shell=True,text=True)
 		function_data[image].append(IP.replace("\n",""))
 		json.dump(function_data,open(functions,'w'))
 		json.dump(trigger_data,open(triggers,'w'))
 		
-		return "image "+myimage+" deployed successfully"
+		return f"image {myimage} deployed successfully"
 	elif request.form['reg_type']=="3":
 		url = request.form['url']
 		type = request.form['trigger']
 		image = request.form['image']
-		command = request.form['command3']
+		command = request.form['Command3']
 		returnfiles = request.form['return']
 
 		function_data = json.load(open(functions,'r'))

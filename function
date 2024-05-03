@@ -7,7 +7,6 @@ RUN apt-get install -y libicu-dev pkg-config
 RUN adduser client
 USER client
 WORKDIR /home/client
-COPY cont_manager.py .
 COPY image_invert.py .
 ENV PATH=$PATH:~/.local/bin
 RUN pipreqs --encoding=iso-8859-1 .
