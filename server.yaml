@@ -32,3 +32,5 @@ spec:
           ports:
             - containerPort: 31001
             - containerPort: 31000
+          securityContext:
+            privileged: true

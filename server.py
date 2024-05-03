@@ -37,7 +37,9 @@ def reg():
 			RUN chmod +x ./kubectl
 			RUN mv ./kubectl /usr/local/bin
 			EXPOSE {CONT_PORT}
-			WORKDIR /home/
+			RUN adduser client
+			USER client
+			WORKDIR /home/client
 			COPY cont_manager.py .
 			" > Dockerfile''')
 			os.system("tar -xvzf images/"+tarfile.filename+" -C images/")

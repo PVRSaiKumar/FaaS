@@ -1,0 +1,14 @@
+FROM ubuntu
+RUN apt-get update && apt-get install -y gcc libreadline6-dev zlib1g-dev bison flex less vim git make
+RUN apt-get install -y python3.11 python3-pip
+RUN pip install pipreqs
+RUN apt-get install -y curl
+RUN apt-get install -y libicu-dev pkg-config
+RUN adduser client
+USER client
+WORKDIR /home/client
+COPY cont_manager.py .
+COPY image_invert.py .
+ENV PATH=$PATH:~/.local/bin
+RUN pipreqs --encoding=iso-8859-1 .
+RUN pip3 install -r requirements.txt
