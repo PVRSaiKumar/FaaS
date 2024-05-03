@@ -68,8 +68,6 @@ def reg():
 			function_data[image]=[command,arguments]
 			trigger_data = json.load(open(triggers,'r'))
 			trigger_data[image]=[]
-			json.dump(function_data,open(functions,'w'))
-			json.dump(trigger_data,open(triggers,'w'))
 
 			### DEPLOYING THE DEPLOYMENT FOR THAT IMAGE
 			yaml_data = f'''apiVersion: apps/v1
@@ -77,16 +75,16 @@ kind: Deployment
 metadata:
   name: image{imageno}-deployment
   labels:
-    app: cont
+    app: image{imageno}-app
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: cont
+      app: image{imageno}-app
   template:
     metadata:
       labels:
-        app: cont
+        app: image{imageno}-app
     spec:
       containers:
       - name: image{imageno}-cont
@@ -116,6 +114,9 @@ spec:
 
 			IP = subprocess.check_output("kubectl --kubeconfig $PWD/config.yaml get services image"+imageno+"-service | awk 'FNR == 2 {print $3; exit}'",shell=True,text=True)
 			function_data[image].append(IP.replace("\n",""))
+			json.dump(function_data,open(functions,'w'))
+			json.dump(trigger_data,open(triggers,'w'))
+
 			return "received "+tarfile.filename+" stored as pvrsaikumar/"+image
 		else:
 			return "incorrect file type"
